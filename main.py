@@ -2,6 +2,7 @@
 import os
 import re
 import sys
+import shutil
 import tarfile
 import httplib
 import logging
@@ -55,5 +56,5 @@ if __name__ == '__main__':
     filepath = download(GEOLITE_CITY_URL)
     filepath = extract(filepath)
     # mv file to given directory
-    os.rename(filepath, "{0}/{1}".format(sys.argv[1].rstrip("\//"),
-                                         os.path.basename(filepath)))
+    shutil.move(filepath, "{0}/{1}".format(sys.argv[1].rstrip("\//"),
+                                           os.path.basename(filepath)))
