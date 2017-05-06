@@ -16,16 +16,19 @@ logger = logging.getLogger(__name__)
 
 
 def download(url):
+    """download compressed file"""
     resp = requests.get(url, stream=True)
     if resp.status_code != httplib.OK:
         msg = "Failed to download: {0} status code: {1}"
         logger.error(msg.format(url, resp.status_code))
         return
     try:
+        # retrieve file name from header
         m = re.search("filename=(.+)",
                       resp.headers.get('Content-Disposition'))
         filename = m.group(1)
         filepath = "{0}/{1}".format(tempfile.gettempdir(), filename)
+        # save file in "tmp" directory
         with open(filepath, 'wb') as fp:
             fp.write(resp.content)
             return fp.name
@@ -34,6 +37,7 @@ def download(url):
 
 
 def extract(filepath):
+    """uncompress and extract file"""
     tmpdir = tempfile.gettempdir()
     with tarfile.open(name=filepath, mode='r:gz') as tf:
         for ti in tf.getmembers():
@@ -50,5 +54,6 @@ if __name__ == '__main__':
         sys.exit(1)
     filepath = download(GEOLITE_CITY_URL)
     filepath = extract(filepath)
+    # mv file to given directory
     os.rename(filepath, "{0}/{1}".format(sys.argv[1].rstrip("\//"),
                                          os.path.basename(filepath)))
